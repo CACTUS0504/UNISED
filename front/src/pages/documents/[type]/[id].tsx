@@ -62,8 +62,9 @@ export default function DocumentPage() {
                             <Button type="default">Печать</Button>
                         </Space>
                     }
+                    //Todo: Заменить type на document.typeId после добавления возможности создания документов
                 >
-                    <DocumentEditor document={document} onSave={handleSave} />
+                    <DocumentEditor document={document} documentTypeId={type} onSave={handleSave} />
                 </Card>
             ) : (
                 <Card>Документ не найден</Card>

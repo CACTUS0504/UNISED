@@ -33,7 +33,7 @@ export const mockApi = {
             id,
             type: id.split('-')[1],
             title: `Документ ${id.split('-')[2]}`,
-            regNumber: `${id.split('-')[1].toUpperCase()}-${1000 + parseInt(id.split('-')[2])}`,
+            regNumber: `${id.split('-')[1]?.toUpperCase()}-${1000 + parseInt(id.split('-')[2])}`,
             date: new Date().toLocaleDateString(),
             author: 'Иванов И.И.',
             status: 'draft',

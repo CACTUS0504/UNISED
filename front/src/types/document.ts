@@ -1,23 +1,39 @@
+export type DocumentStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'completed' | 'active' | 'deleted';
+
+export interface Document {
+    id: string;
+    typeId: string;
+    title: string;
+    fields: Record<string, any>;
+    status: DocumentStatus;
+    rawDate: string; // Оригинальная дата в формате ISO
+    createdAt: string; // Отформатированная дата
+    updatedAt?: string;
+    author?: string;
+    regNumber?: string;
+}
+
 export interface DocumentType {
     id: string;
     name: string;
     description?: string;
-    fields: DocumentField[];
-    layout: DocumentLayout;
-    createdAt: string;
-}
-
-export interface DocumentField {
-    name: string;
-    type: 'text' | 'number' | 'date' | 'select' | 'textarea';
-    required: boolean;
-    options?: string[];
-}
-
-export interface DocumentLayout {
-    // Определите структуру вашего layout
-    sections: Array<{
-        title: string;
-        fields: string[]; // field names
+    layout: {
+        tabs: Array<{
+            name: string;
+            rows: Array<{
+                fields: Array<{
+                    name: string;
+                    order: number;
+                }>;
+            }>;
+        }>;
+    };
+    fields: Array<{
+        name: string;
+        fieldType: 'string' | 'number' | 'datetime' | 'bool' | 'select';
+        isRequired: boolean;
+        description?: string;
+        options?: string[];
     }>;
+    createdAt: string;
 }

@@ -10,7 +10,8 @@ public class GetDocumentCardResponse
     public string Id { get; set; }
     public string TypeId { get; set; }
     public JsonNode? Data { get; set; }
-    public Guid CreatedById { get; set; }
+    public String CreatedById { get; set; }
+    public DateTime CreatedAt { get; set; }
     public bool IsDeleted { get; set; }
 
     public static GetDocumentCardResponse FromDocumentCard(DocumentCard documentCard)
@@ -20,6 +21,8 @@ public class GetDocumentCardResponse
             Id = documentCard.Id,
             TypeId = documentCard.TypeId,
             Data = JsonNode.Parse(documentCard.Data.ToJson()),
+            CreatedById = documentCard.CreatedById,
+            CreatedAt = documentCard.CreatedAt,
         };
     }
 }
