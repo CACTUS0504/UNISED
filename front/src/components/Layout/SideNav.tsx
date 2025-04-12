@@ -1,52 +1,41 @@
-import { Layout, Menu, Typography } from 'antd'
-import {
-    FileOutlined,
-    InboxOutlined,
-    SendOutlined,
-    ClockCircleOutlined,
-    CheckCircleOutlined,
-    FolderOutlined,
-} from '@ant-design/icons'
-import { useRouter } from 'next/router'
+import { Layout, Menu, Typography, Spin } from 'antd';
+import { FolderOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { fetchDocumentTypes } from '@/services/documentTypes';
+import { DocumentType } from '@/types/document';
 
-const { Sider } = Layout
-const { Title } = Typography
+const { Sider } = Layout;
+const { Title } = Typography;
 
 export default function SideNav() {
-    const router = useRouter()
+    const router = useRouter();
+    const [types, setTypes] = useState<DocumentType[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const menuItems = [
-        {
-            key: 'inbox',
-            icon: <InboxOutlined />,
-            label: 'Входящие',
-        },
-        {
-            key: 'outbox',
-            icon: <SendOutlined />,
-            label: 'Исходящие',
-        },
-        {
-            key: 'drafts',
-            icon: <FileOutlined />,
-            label: 'Черновики',
-        },
-        {
-            key: 'pending',
-            icon: <ClockCircleOutlined />,
-            label: 'На согласовании',
-        },
-        {
-            key: 'completed',
-            icon: <CheckCircleOutlined />,
-            label: 'Завершенные',
-        },
-        {
-            key: 'templates',
-            icon: <FolderOutlined />,
-            label: 'Шаблоны',
-        },
-    ]
+    useEffect(() => {
+        const loadTypes = async () => {
+            try {
+                const data = await fetchDocumentTypes();
+                setTypes(data);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to load document types');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadTypes();
+    }, []);
+
+    if (error) {
+        return (
+            <Sider width={250} theme="light">
+                <div style={{ padding: 16, color: 'red' }}>{error}</div>
+            </Sider>
+        );
+    }
 
     return (
         <Sider width={250} theme="light" breakpoint="lg" collapsedWidth="0">
@@ -55,13 +44,24 @@ export default function SideNav() {
                     Документооборот ВУЗа
                 </Title>
             </div>
-            <Menu
-                theme="light"
-                mode="inline"
-                selectedKeys={[router.pathname.split('/')[2] || 'inbox']}
-                items={menuItems}
-                onSelect={({ key }) => router.push(`/documents/${key}`)}
-            />
+
+            {loading ? (
+                <div style={{ padding: 16, textAlign: 'center' }}>
+                    <Spin />
+                </div>
+            ) : (
+                <Menu
+                    theme="light"
+                    mode="inline"
+                    selectedKeys={[router.query.type as string || '']}
+                    items={types.map(type => ({
+                        key: type.id,
+                        icon: <FolderOutlined />,
+                        label: type.name,
+                        onClick: () => router.push(`/documents/${type.id}`),
+                    }))}
+                />
+            )}
         </Sider>
-    )
+    );
 }

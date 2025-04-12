@@ -1,44 +1,46 @@
-import { useState, useEffect } from 'react'
-import { mockApi } from '@/utils/api'
-import { Document } from '@/types/document'
+import { useState, useEffect } from 'react';
+import { mockApi } from '@/utils/api';
+import { Document } from '@/types/document';
+import { Pagination } from '@/types/api';
 
-interface Pagination {
-    currentPage: number
-    itemsPerPage: number
-    totalItems: number
-    totalPages: number
-}
-
-export default function useDocuments(type: string) {
-    const [documents, setDocuments] = useState<Document[]>([])
-    const [loading, setLoading] = useState(true)
+export default function useDocuments(typeId: string) {
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState<Pagination>({
         currentPage: 1,
         itemsPerPage: 10,
         totalItems: 0,
         totalPages: 1,
-    })
+    });
 
     const fetchDocuments = async (page = 1) => {
-        setLoading(true)
+        setLoading(true);
         try {
-            const response = await mockApi.getDocuments(type, page, pagination.itemsPerPage)
-            setDocuments(response.data)
-            setPagination(response.pagination)
+            // Здесь нужно заменить mockApi на реальный вызов к вашему ASP.NET API
+            // Например:
+            // const response = await fetch(`/api/documents?type=${typeId}&page=${page}`);
+            // const data = await response.json();
+
+            // Временно используем мок данные:
+            const response = await mockApi.getDocuments(typeId, page, pagination.itemsPerPage);
+            setDocuments(response.data);
+            setPagination(response.pagination);
         } catch (error) {
-            console.error('Error fetching documents:', error)
+            console.error('Error fetching documents:', error);
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
     useEffect(() => {
-        fetchDocuments()
-    }, [type])
+        if (typeId) {
+            fetchDocuments();
+        }
+    }, [typeId]);
 
     const handlePageChange = (page: number) => {
-        fetchDocuments(page)
-    }
+        fetchDocuments(page);
+    };
 
     return {
         documents,
@@ -46,5 +48,5 @@ export default function useDocuments(type: string) {
         pagination,
         handlePageChange,
         refresh: () => fetchDocuments(pagination.currentPage),
-    }
+    };
 }

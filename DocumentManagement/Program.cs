@@ -21,6 +21,15 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(settings.ConnectionString);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        builder => builder
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 builder.Services.AddScoped(sp =>
 {
     var client = sp.GetRequiredService<IMongoClient>();
@@ -58,6 +67,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+app.UseCors("AllowFrontend");
 
 app.Run();
 

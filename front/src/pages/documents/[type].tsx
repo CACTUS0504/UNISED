@@ -1,23 +1,37 @@
-import { useRouter } from 'next/router'
-import { Breadcrumb, Card, Spin } from 'antd'
-import DocumentList from '@/components/Documents/DocumentList'
-import useDocuments from '@/hooks/useDocuments'
-import { HomeOutlined } from '@ant-design/icons'
+import { useRouter } from 'next/router';
+import { Breadcrumb, Card, Spin, Typography } from 'antd';
+import DocumentList from '@/components/Documents/DocumentList';
+import useDocuments from '@/hooks/useDocuments';
+import { HomeOutlined } from '@ant-design/icons';
+import { fetchDocumentTypeById } from '@/services/documentTypes';
+import { useEffect, useState } from 'react';
+import { DocumentType } from '@/types/document';
+
+const { Title } = Typography;
 
 export default function DocumentTypePage() {
-    const router = useRouter()
-    const { type } = router.query as { type: string }
+    const router = useRouter();
+    const { type: typeId } = router.query as { type: string };
+    const [documentType, setDocumentType] = useState<DocumentType | null>(null);
+    const [loadingType, setLoadingType] = useState(true);
 
-    const { documents, loading, pagination } = useDocuments(type)
+    const { documents, loading, pagination } = useDocuments(typeId);
 
-    const documentTypes = {
-        inbox: 'Входящие документы',
-        outbox: 'Исходящие документы',
-        drafts: 'Черновики',
-        pending: 'Документы на согласовании',
-        completed: 'Завершенные документы',
-        templates: 'Шаблоны документов',
-    }
+    useEffect(() => {
+        if (typeId) {
+            const loadType = async () => {
+                try {
+                    const type = await fetchDocumentTypeById(typeId);
+                    setDocumentType(type);
+                } catch (err) {
+                    console.error('Failed to load document type:', err);
+                } finally {
+                    setLoadingType(false);
+                }
+            };
+            loadType();
+        }
+    }, [typeId]);
 
     return (
         <>
@@ -25,21 +39,21 @@ export default function DocumentTypePage() {
                 style={{ marginBottom: 16 }}
                 items={[
                     { href: '/', title: <HomeOutlined /> },
-                    { title: documentTypes[type as keyof typeof documentTypes] || type },
+                    { title: loadingType ? 'Загрузка...' : documentType?.name || 'Неизвестный тип' },
                 ]}
             />
 
-            <Card title={documentTypes[type as keyof typeof documentTypes] || type}>
-                {loading ? (
+            <Card title={documentType?.name || 'Документы'}>
+                {loading || loadingType ? (
                     <Spin size="large" />
                 ) : (
                     <DocumentList
                         documents={documents}
                         pagination={pagination}
-                        onDocumentSelect={(id) => router.push(`/documents/${type}/${id}`)}
+                        onDocumentSelect={(id) => router.push(`/documents/${typeId}/${id}`)}
                     />
                 )}
             </Card>
         </>
-    )
+    );
 }
