@@ -20,6 +20,9 @@ const formatDate = (dateString: string) => {
 
 export default function useDocuments(typeId: string) {
     const [documents, setDocuments] = useState<Document[]>([]);
+    const refresh = async () => {
+        await fetchDocuments();
+    };
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [pagination, setPagination] = useState<Pagination>({
@@ -32,7 +35,6 @@ export default function useDocuments(typeId: string) {
     const fetchDocuments = async (page = 1) => {
         setLoading(true);
         setError(null);
-
         try {
             const response = await fetch(
                 `${API_URL}/documents/type/${typeId}?page=${page}&pageSize=${pagination.itemsPerPage}`
@@ -80,6 +82,6 @@ export default function useDocuments(typeId: string) {
         error,
         pagination,
         handlePageChange,
-        refresh: () => fetchDocuments(pagination.currentPage),
+        refresh
     };
 }

@@ -1,16 +1,13 @@
 export type DocumentStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'completed' | 'active' | 'deleted';
 
-export interface Document {
-    id: string;
-    typeId: string;
-    title: string;
-    fields: Record<string, any>;
-    status: DocumentStatus;
-    rawDate: string; // Оригинальная дата в формате ISO
-    createdAt: string; // Отформатированная дата
-    updatedAt?: string;
-    author?: string;
-    regNumber?: string;
+export type FieldType = 'string' | 'number' | 'datetime' | 'bool' | 'select';
+
+export interface DocumentTypeField {
+    name: string;
+    fieldType: FieldType;
+    isRequired: boolean;
+    description?: string;
+    options?: string[];
 }
 
 export interface DocumentType {
@@ -30,10 +27,23 @@ export interface DocumentType {
     };
     fields: Array<{
         name: string;
-        fieldType: 'string' | 'number' | 'datetime' | 'bool' | 'select';
+        fieldType: 'string' | 'number' | 'datetime' | 'boolean' | 'select';
         isRequired: boolean;
         description?: string;
         options?: string[];
     }>;
     createdAt: string;
+}
+
+export interface Document {
+    id: string;
+    typeId: string;
+    title: string;
+    fields: Record<string, any>;
+    attachments?: string[];
+    status: DocumentStatus;
+    createdAt: string;
+    updatedAt?: string;
+    author?: string;
+    regNumber?: string;
 }

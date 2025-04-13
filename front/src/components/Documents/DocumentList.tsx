@@ -1,20 +1,38 @@
-import { List, Pagination, Button, Space, Tag, Typography } from 'antd'
-import { Document } from '@/types/document'
-import { Pagination as PaginationType } from '@/types/api'
+import { List, Pagination, Button, Space, Tag, Typography } from 'antd';
+import { Document } from '@/types/document';
+import { Pagination as PaginationType } from '@/types/api';
 
 interface DocumentListProps {
-    documents: Document[]
-    pagination: PaginationType
-    onDocumentSelect: (id: string) => void
+    documents: Document[];
+    pagination: PaginationType;
+    onDocumentSelect: (id: string) => void;
+    onCreate?: () => void;
+    loading?: boolean;
+    error?: string | null;
 }
 
-export default function DocumentList({documents, pagination, onDocumentSelect, loading, error}: DocumentListProps)
-    {
-        if (error) {
-            return <div style={{ color: 'red', padding: 16 }}>{error}</div>;
+export default function DocumentList({
+                                         documents,
+                                         pagination,
+                                         onDocumentSelect,
+                                         onCreate,
+                                         loading,
+                                         error
+                                     }: DocumentListProps) {
+    if (error) {
+        return <div style={{ color: 'red', padding: 16 }}>{error}</div>;
     }
+
     return (
         <Space direction="vertical" style={{ width: '100%' }}>
+            {onCreate && (
+                <div style={{ textAlign: 'right', marginBottom: 16 }}>
+                    <Button type="primary" onClick={onCreate}>
+                        Создать новый документ
+                    </Button>
+                </div>
+            )}
+
             <List
                 loading={loading}
                 dataSource={documents}
@@ -41,7 +59,7 @@ export default function DocumentList({documents, pagination, onDocumentSelect, l
                                     </Typography.Text>
                                     <Typography.Text>{doc.author || 'Система'}</Typography.Text>
                                     <Typography.Text type="secondary">
-                                        {doc.createdAt}
+                                        {new Date(doc.createdAt).toLocaleString('ru-RU')}
                                     </Typography.Text>
                                 </Space>
                             }
@@ -49,16 +67,18 @@ export default function DocumentList({documents, pagination, onDocumentSelect, l
                     </List.Item>
                 )}
             />
+
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <Pagination
                     current={pagination.currentPage}
                     total={pagination.totalItems}
                     pageSize={pagination.itemsPerPage}
+                    onChange={pagination.handlePageChange}
                     showSizeChanger
                     showQuickJumper
                     showTotal={(total) => `Всего ${total} документов`}
                 />
             </div>
         </Space>
-    )
+    );
 }
