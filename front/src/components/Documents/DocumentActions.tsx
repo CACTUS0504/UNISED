@@ -14,7 +14,7 @@ export default function DocumentActions({
                                             cancelText = 'Отмена'
                                         }: DocumentActionsProps) {
     return (
-        <Space style={{ float: 'right' }}>
+        <Space style={{ float: 'right', marginTop: '-20px' }}>
             <Button onClick={onCancel}>
                 {cancelText}
             </Button>

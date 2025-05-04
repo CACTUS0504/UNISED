@@ -3,6 +3,7 @@ import { Layout, ConfigProvider } from 'antd'
 import { StyleProvider } from '@ant-design/cssinjs'
 import SideNav from '@/components/Layout/SideNav'
 import Header from '@/components/Layout/Header'
+import AuthGuard from '@/components/AuthGuard';
 import '@/styles/globals.css'
 
 export default function App({ Component, pageProps }: AppProps) {
